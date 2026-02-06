@@ -1,4 +1,4 @@
-.DS_Store
 node_modules/
-var/
-
+.tmp/
+*.log
+.DS_Store

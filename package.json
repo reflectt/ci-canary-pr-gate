@@ -1,0 +1,27 @@
+{
+  "name": "ci-canary-pr-gate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GitHub Action: run a canary/eval command, upload a JSON report artifact, optionally diff against a baseline, and post/update a PR comment.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/index.js -o dist --source-map --license licenses.txt",
+    "package": "npm run build",
+    "lint": "node -c src/index.js",
+    "test": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reflectt/ci-canary-pr-gate.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@actions/artifact": "^2.1.10",
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0",
+    "adm-zip": "^0.5.16"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
+  }
+}

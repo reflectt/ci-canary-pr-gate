@@ -1,0 +1,98 @@
+name: 'CI Canary PR Gate'
+description: 'Run a canary/eval command, upload a JSON report artifact, optionally diff against a baseline, and (on PRs) post/update a summary comment.'
+author: 'reflectt'
+
+inputs:
+  command:
+    description: 'Shell command to run the canary/eval suite. Must produce the report JSON at report_path.'
+    required: true
+  report_path:
+    description: 'Path to the canonical JSON report produced by the command.'
+    required: false
+    default: 'eval-report.json'
+  artifact_name:
+    description: 'Name for the uploaded workflow artifact.'
+    required: false
+    default: 'ci-canary-report'
+  retention_days:
+    description: 'Artifact retention days (passed to upload-artifact client).'
+    required: false
+    default: '14'
+
+  comment_mode:
+    description: 'create-or-update | create | off'
+    required: false
+    default: 'create-or-update'
+  comment_title:
+    description: 'Title used in the PR comment heading.'
+    required: false
+    default: 'CI Canary'
+  github_token:
+    description: 'GitHub token for PR comment + optional baseline artifact download.'
+    required: false
+    default: '${{ github.token }}'
+
+  baseline_path:
+    description: 'Path to a baseline JSON report in the repo.'
+    required: false
+    default: ''
+  baseline_artifact:
+    description: 'Artifact name to download as baseline from a workflow run.'
+    required: false
+    default: ''
+  baseline_workflow:
+    description: 'Workflow name, file name (e.g. canary.yml), or workflow id to locate baseline artifacts.'
+    required: false
+    default: ''
+  baseline_ref:
+    description: 'Ref for baseline lookup when using baseline artifact.'
+    required: false
+    default: 'refs/heads/main'
+
+  fail_on_command_error:
+    description: 'If true, fail when command exits non-zero.'
+    required: false
+    default: 'true'
+  fail_on_any_scenario_fail:
+    description: 'If true, fail when any scenario has passed=false.'
+    required: false
+    default: 'true'
+  min_score:
+    description: 'If set, fail when report.summary.score < min_score.'
+    required: false
+    default: ''
+  max_score_drop:
+    description: 'If set and baseline exists, fail when (baseline.score - score) > max_score_drop.'
+    required: false
+    default: ''
+  max_metric_regressions_json:
+    description: 'JSON map of metric thresholds (fail if metric delta vs baseline > threshold). Example: {"latency_p95_ms":500, "cost_usd":0.1}'
+    required: false
+    default: ''
+
+  dashboard_url:
+    description: 'Optional dashboard link to include in the PR comment.'
+    required: false
+    default: ''
+  health_alerts_url:
+    description: 'Optional health alerts link to include in the PR comment.'
+    required: false
+    default: ''
+
+outputs:
+  passed:
+    description: 'true|false'
+  score:
+    description: 'Numeric score as string'
+  score_delta:
+    description: 'Numeric score delta vs baseline as string (empty if no baseline)'
+  failed_scenarios:
+    description: 'Count of failed scenarios as string'
+  report_path:
+    description: 'Resolved report path'
+  artifact_name:
+    description: 'Artifact name used'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
